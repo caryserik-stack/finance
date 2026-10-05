@@ -18,7 +18,7 @@ function Shell({ theme, setTheme }) {
   return (
     <div className="app">
       <nav className="side">
-        <div className="logo">💰 <span>Finance</span></div>
+        <div className="logo"><img src='/logo-icon.png' alt='' /><span>AbdyRahim's Finance</span></div>
         {NAV.map(([to, label, icon]) => (
           <NavLink key={to} to={to} end={to === '/'}>
             {({ isActive }) => <>{isActive && <motion.span layoutId="pill" className="pill" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}<span className="nav-label">{icon} {t(label)}</span></>}

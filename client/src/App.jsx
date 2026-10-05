@@ -11,24 +11,45 @@ import Transactions from './pages/Transactions.jsx';
 
 const NAV = [['/', 'Dashboard', '🏠'], ['/transactions', 'Transactions', '🔁'], ['/income', 'Income', '📈'], ['/expenses', 'Expenses', '📉'], ['/budgets', 'Budgets', '🎯'], ['/goals', 'Goals', '🏆'], ['/subscriptions', 'Subscriptions', '🔔'], ['/settings', 'Settings', '⚙️']];
 
-function Shell({ theme, setTheme }) {
+// Переключатели языка и темы: внизу сайдбара (десктоп/планшет) и в верхней шапке (телефон).
+function Controls({ theme, setTheme }) {
   const t = useT();
   const { lang, setLang } = useContext(AppCtx);
+  const toDark = theme === 'light'; // кнопка предлагает переключиться на тёмную
+  return (
+    <>
+      <div className="seg">{Object.entries(LANGS).map(([k, label]) => <button key={k} className={lang === k ? 'on' : ''} onClick={() => setLang(k)}>{label}</button>)}</div>
+      <motion.button whileTap={{ scale: 0.95 }} className="btn ghost" onClick={() => setTheme(toDark ? 'dark' : 'light')}>
+        <span className="ico">{toDark ? '🌙' : '☀️'}</span> <span className="nav-text">{t(toDark ? 'Dark' : 'Light')}</span>
+      </motion.button>
+    </>
+  );
+}
+
+function Shell({ theme, setTheme }) {
+  const t = useT();
   const location = useLocation();
   return (
     <div className="app">
       <nav className="side">
-        <div className="logo"><img src='/logo-icon.png' alt='' /><span>AbdyRahim's Finance</span></div>
+        <div className="logo"><img src="/logo-icon.png" alt="" /><span>AbdyRahim's Finance</span></div>
         {NAV.map(([to, label, icon]) => (
-          <NavLink key={to} to={to} end={to === '/'}>
-            {({ isActive }) => <>{isActive && <motion.span layoutId="pill" className="pill" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}<span className="nav-label">{icon} {t(label)}</span></>}
+          <NavLink key={to} to={to} end={to === '/'} title={t(label)}>
+            {({ isActive }) => <>
+              {isActive && <motion.span layoutId="pill" className="pill" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}
+              <span className="nav-label"><span className="ico">{icon}</span><span className="nav-text">{t(label)}</span></span>
+            </>}
           </NavLink>
         ))}
-        <div className="side-foot">
-          <div className="seg">{Object.entries(LANGS).map(([k, label]) => <button key={k} className={lang === k ? 'on' : ''} onClick={() => setLang(k)}>{label}</button>)}</div>
-          <motion.button whileTap={{ scale: 0.95 }} className="btn ghost" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? `🌙 ${t('Dark')}` : `☀️ ${t('Light')}`}</motion.button>
-        </div>
+        <div className="side-foot"><Controls theme={theme} setTheme={setTheme} /></div>
       </nav>
+
+      {/* Видна только на телефоне */}
+      <header className="topbar">
+        <div className="logo"><img src="/logo-icon.png" alt="" /><span>AbdyRahim's Finance</span></div>
+        <div className="topbar-ctl"><Controls theme={theme} setTheme={setTheme} /></div>
+      </header>
+
       <main className="main">
         <AnimatePresence mode="wait">
           <motion.div key={location.pathname} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>

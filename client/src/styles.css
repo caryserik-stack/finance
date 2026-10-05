@@ -118,6 +118,9 @@ h2 {
   position: relative;
   z-index: 1;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .side-foot {
   margin-top: auto;
@@ -180,11 +183,12 @@ h2 {
 .grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  /* min(..., 100%) не даёт колонке стать шире экрана */
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
   margin-bottom: 18px;
 }
 .grid.wide {
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
 }
 .label {
   color: var(--muted);
@@ -220,6 +224,9 @@ input,
 select {
   font: inherit;
   color: var(--text);
+}
+button {
+  touch-action: manipulation; /* убирает задержку тапа на телефоне */
 }
 input,
 select {
@@ -399,27 +406,214 @@ tbody tr:hover {
     background-position: -200% 0;
   }
 }
-@media (max-width: 800px) {
+
+/* Верхняя шапка существует только на телефоне */
+.topbar {
+  display: none;
+}
+
+/* ================= Планшет: сайдбар-«рейка» с иконками ================= */
+@media (min-width: 641px) and (max-width: 900px) {
+  .side {
+    width: 76px;
+    padding: 18px 8px;
+    align-items: center;
+  }
+  .side .logo {
+    padding: 4px 0 14px;
+    justify-content: center;
+  }
+  .side .logo span,
+  .side .nav-text {
+    display: none;
+  }
+  .side a {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 11px 0;
+  }
+  .side-foot {
+    width: 100%;
+  }
+  .seg {
+    flex-direction: column;
+  }
+  .side-foot .btn {
+    padding: 10px 0;
+  }
+  .main {
+    padding: 24px;
+  }
+}
+
+/* ======================== Телефон ======================== */
+@media (max-width: 640px) {
   .app {
     flex-direction: column;
   }
+
+  /* верхняя шапка: логотип + язык + тема */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 8px 12px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+    background: color-mix(in srgb, var(--card) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar .logo {
+    padding: 0;
+    font-size: 15px;
+  }
+  .topbar-ctl {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .topbar .nav-text {
+    display: none;
+  }
+  .topbar .btn {
+    padding: 8px 12px;
+  }
+
+  /* нижняя панель табов */
   .side {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
     width: auto;
     height: auto;
     flex-direction: row;
+    gap: 2px;
     overflow-x: auto;
-    position: static;
-    align-items: center;
-    padding: 10px;
+    z-index: 5;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    border-right: 0;
+    border-top: 1px solid var(--line);
   }
-  .logo {
+  .side .logo,
+  .side .side-foot {
     display: none;
   }
-  .side-foot {
-    margin: 0 0 0 auto;
-    display: flex;
+  .side a {
+    flex: 1 0 64px;
+    padding: 6px 4px;
+    font-size: 10px;
+    text-align: center;
   }
+  .side .nav-label {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .side .ico {
+    font-size: 20px;
+  }
+
+  /* место под нижнюю панель, иначе она перекроет контент */
   .main {
+    padding: 16px 16px calc(84px + env(safe-area-inset-bottom));
+  }
+  h2 {
+    font-size: 22px;
+  }
+  .card {
     padding: 16px;
+    border-radius: 16px;
+  }
+
+  /* карточки показателей: 2 колонки, «Финансовое здоровье» на всю ширину */
+  .grid.stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .grid.stats .hero {
+    grid-column: 1 / -1;
+  }
+
+  /* фильтры: по 2 в ряд, поиск на всю ширину */
+  .filters > * {
+    min-width: calc(50% - 8px);
+  }
+  .filters .f-search {
+    min-width: 100%;
+  }
+
+  /* iOS не зумит поля с шрифтом >= 16px */
+  input,
+  select {
+    font-size: 16px;
+  }
+
+  /* модалка не выше экрана */
+  .modal form {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* таблица транзакций -> карточки */
+  .tx,
+  .tx tbody {
+    display: block;
+  }
+  .tx thead {
+    display: none;
+  }
+  .tx tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    grid-template-areas:
+      "cat amt"
+      "desc desc"
+      "date act";
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tx td {
+    border: 0;
+    padding: 0;
+    white-space: normal;
+  }
+  .tx .c-cat {
+    grid-area: cat;
+    font-weight: 600;
+  }
+  .tx .c-amt {
+    grid-area: amt;
+    text-align: right;
+  }
+  .tx .c-desc {
+    grid-area: desc;
+    color: var(--muted);
+  }
+  .tx .c-date {
+    grid-area: date;
+    color: var(--muted);
+    font-size: 13px;
+    align-self: center;
+  }
+  .tx .c-act {
+    grid-area: act;
+    justify-self: end;
+  }
+  .tx .c-type {
+    display: none; /* тип виден по знаку и цвету суммы */
+  }
+}
+
+/* ============ Сенсорные экраны: кнопки покрупнее ============ */
+@media (pointer: coarse) {
+  .btn.sm {
+    padding: 9px 14px;
   }
 }

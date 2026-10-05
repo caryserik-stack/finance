@@ -30,7 +30,7 @@ export default function Dashboard() {
       <div className="head"><h2>{t('Dashboard')}</h2><motion.button whileTap={{ scale: 0.95 }} className="btn" onClick={() => setAdding(true)}>{t('+ Add Transaction')}</motion.button></div>
       <Status loading={loading && !d} error={error}>
         {d && <>
-          <Stagger className="grid">
+          <Stagger className="grid stats">
             <Stat icon="💼" label={t('Balance')} value={d.balance} format={money} />
             <Stat icon="📈" label={t('Income (this month)')} value={d.income} format={money} cls="green" />
             <Stat icon="📉" label={t('Expenses (this month)')} value={d.expenses} format={money} cls="red" />
